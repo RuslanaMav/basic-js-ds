@@ -21,59 +21,63 @@ class BinarySearchTree {
     function addNode(node, val) {
       if (!node) return new Node(val);
       if (node.data === val) return node;
-      if (node.data > val) node.right = addNode(node.right, val);
-      else node.left = addNode(node.left, val);
+      if (val < node.data) node.left = addNode(node.left, val);
+      else node.right = addNode(node.right, val);
       return node;
     }
   }
 
+  _searchNode(node, val) {
+    if (!node) return null;
+    if (node.data === val) return node;
+    if (node.data > val) return this._searchNode(node.left, val)
+    else return this._searchNode(node.right, val);
+  }
+
   has(data) {
+    return this._searchNode(this.rootNode, data) !== null;
+  }
+
+  find(data) {
     return this._searchNode(this.rootNode, data);
   }
 
-  _searchNode(node, val) {
-    if (!node) return false;
-    if (node.data === val) return true;
-    return node.data > val ? this._searchNode(node.right, val) : this._searchNode(node.left, val);
-  }
-
-
-  find(/*data*/) {
-    throw new NotImplementedError('Not implemented');
-  }
 
   remove(data) {
-    //throw new NotImplementedError('Not implemented');
-    let root = this.rootNode;
-  
+    this.rootNode = removeEl(this.rootNode, data);
 
-    function removaNode() {
-      
+    function removeEl(node, val) {
+      if (!node) return null;
+      if (val > node.data) node.right = removeEl(node.right, val);
+      else if (val < node.data) node.left = removeEl(node.left, val);
+      else {
+        if (!node.right && !node.left) return null;
+        if (!node.right) return node.left;
+        if (!node.left) return node.right;
+
+        let minNode = node.right;
+        while (minNode.left)
+          minNode = minNode.left;
+        node.data = minNode.data;
+        node.right = removeEl(node.right, minNode.data);
+      }
+      return node;
     }
-    
-  }
 
-
-  findMin(node) {
-    while (node.left) 
-      node = node.left;
-    return node;
-  }
-
-  findMax(node) {
-    while (node.right) 
-      node = node.right;
-    return node;
   }
 
   min() {
-    const node = this.findMin(this.rootNode);
-    return node ? node.data : null;
+    let minNode = this.rootNode;
+    while (minNode.left)
+      minNode = minNode.left;
+    return minNode.data;
   }
 
   max() {
-    const node =this.findMin(this.rootNode);
-    return node ? node.data : null;
+    let node = this.rootNode;
+    while (node.right)
+      node = node.right;
+    return node.data;
   }
 
 }
